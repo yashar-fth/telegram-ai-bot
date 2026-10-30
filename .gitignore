@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.venv/
+env/
+test_*.py
+list_models.py
+find_working_model.py

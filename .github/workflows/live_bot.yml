@@ -1,0 +1,26 @@
+name: Live Telegram AI Bot (Long Polling)
+
+on:
+  workflow_dispatch: # Trigger manually from GitHub Actions tab
+
+jobs:
+  run-live-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350 # Runs up to ~6 hours per trigger
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Live Bot
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python bot.py

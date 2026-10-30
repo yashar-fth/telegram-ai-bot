@@ -1,0 +1,38 @@
+name: Telegram Channel AI Summarizer
+
+on:
+  schedule:
+    # Runs every 30 minutes automatically
+    - cron: '*/30 * * * *'
+  workflow_dispatch: # Allows manual trigger with a single button click in GitHub
+
+permissions:
+  contents: write # Needed to commit seen_posts.json back to repo
+
+jobs:
+  check-and-summarize:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Bot in Cron Mode
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python bot.py --cron
+
+      - name: Commit and Push Updated Seen Posts
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add seen_posts.json || true
+          git diff --staged --quiet || (git commit -m "chore: update seen posts history [skip ci]" && git push)
